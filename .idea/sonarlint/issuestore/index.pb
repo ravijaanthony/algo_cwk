@@ -17,3 +17,6 @@ Q
 !maze_folder/examples/maze10_1.txt,5\6\56e7d67980b44d07f1f37552f38628930cb3bc14
 Q
 !maze_folder/examples/maze10_2.txt,6\d\6d927a8742cccfa00ab9264e9245bf56806445de
+:
+
+.gitignore,a\5\a5cc2925ca8258af241be7e5b0381edf30266302
