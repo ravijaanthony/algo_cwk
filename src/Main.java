@@ -5,6 +5,7 @@ import javax.swing.*;
 
 public class Main {
     static Scanner scanner = new Scanner(System.in);
+    static Game game = new Game();
     static String[][] mazeArray;
 
     public static void main(String[] args) throws FileNotFoundException {
@@ -38,7 +39,7 @@ public class Main {
 
     /// Demo file
     static void demo() {
-        File myFile = new File("./maze_folder/examples/maze10_1.txt");
+        File myFile = new File("./maze_folder/examples/maze10_2.txt");
         try {
             int lines = 0;
             int columns = 0;
@@ -68,14 +69,16 @@ public class Main {
             }
             scanner.close();
 
+            // Send the maze as an array to the game
+            game.GameArray(mazeArray);
 
 //             Print the mazeArray (for verification)
-            for (int i = 0; i < mazeArray.length; i++) {
-                for (int j = 0; j < mazeArray[i].length; j++) {
-                    System.out.print(mazeArray[i][j]);
-                }
-                System.out.println();
-            }
+//            for (int i = 0; i < mazeArray.length; i++) {
+//                for (int j = 0; j < mazeArray[i].length; j++) {
+//                    System.out.print(mazeArray[i][j]);
+//                }
+//                System.out.println();
+//            }
 
 
         } catch (FileNotFoundException e) {
@@ -143,13 +146,16 @@ public class Main {
             }
             scanner.close();
 
+            // Send the maze as an array to the game
+            game.GameArray(mazeArray);
+
             // Print the mazeArray (for verification)
-            for (int i = 0; i < mazeArray.length; i++) {
-                for (int j = 0; j < mazeArray[i].length; j++) {
-                    System.out.print(mazeArray[i][j]);
-                }
-                System.out.println();
-            }
+//            for (int i = 0; i < mazeArray.length; i++) {
+//                for (int j = 0; j < mazeArray[i].length; j++) {
+//                    System.out.print(mazeArray[i][j]);
+//                }
+//                System.out.println();
+//            }
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
