@@ -27,4 +27,8 @@ To run this project, ensure you have Java Development Kit (JDK) installed on you
 3. Compile the Java files: javac *.java
 4. OR run it in your IDE
 
+Running the program would output the shortest path from 'S' to 'F' in the maze.
 
+## Credits
+
+This project was developed by Ravija Anthony as coursework for DSA-UoW/IIT.
