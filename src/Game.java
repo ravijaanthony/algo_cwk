@@ -4,7 +4,6 @@ public class Game {
     static String[][] maze;
 
     static int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-    static String[] directionNames = {"UP", "DOWN", "LEFT", "RIGHT"};
 
     // Start and end position of the maze
     static int startRow, startCol;
@@ -111,8 +110,6 @@ public class Game {
                             int tempRow = current.row + directions[j][0];
                             int tempCol = current.col + directions[j][1];
                             if (isValid(tempRow, tempCol) && !maze[tempRow][tempCol].equals("0") && !closedSet.contains(nodeKey(tempRow, tempCol))) {
-                                newRow = tempRow;
-                                newCol = tempCol;
                                 break;
                             }
                         }
