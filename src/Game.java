@@ -1,18 +1,6 @@
 import java.util.*;
 
 public class Game {
-//    static String[][] maze = {
-//            {".", ".", ".", ".", ".", "0", ".", ".", ".", "S"},
-//            {".", ".", ".", ".", "0", ".", ".", ".", ".", "."},
-//            {"0", ".", ".", ".", ".", ".", "0", ".", ".", "0"},
-//            {".", ".", ".", "0", ".", ".", ".", ".", "0", "."},
-//            {".", "F", ".", ".", ".", ".", ".", ".", ".", "0"},
-//            {".", "0", ".", ".", ".", ".", ".", ".", ".", "."},
-//            {".", ".", ".", ".", ".", ".", ".", "0", ".", "."},
-//            {".", "0", ".", "0", ".", ".", "0", ".", ".", "0"},
-//            {"0", ".", ".", ".", ".", ".", ".", ".", ".", "."},
-//            {".", "0", "0", ".", ".", ".", ".", ".", "0", "."}
-//    };
     static String[][] maze;
 
     static int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
@@ -56,8 +44,6 @@ public class Game {
                 }
             }
         }
-//        System.out.println("Start: (" + startRow + ", " + startCol + ")");
-//        System.out.println("End: (" + endRow + ", " + endCol + ")");
     }
 
     static List<Node> findPath() {
@@ -72,11 +58,9 @@ public class Game {
 
         Node goalNode = null;
         List<String> log = new ArrayList<>();
-//        log.add("Start finding 'F'...");
 
         while (!openSet.isEmpty()) {
             Node current = openSet.pollFirst();
-//            log.add("Current node: (" + current.row + ", " + current.col + ")");
 
             if (current.row == endRow && current.col == endCol) {
                 goalNode = current;
@@ -93,7 +77,6 @@ public class Game {
                         !maze[newRow + directions[i][0]][newCol + directions[i][1]].equals("F")) {
                     newRow += directions[i][0];
                     newCol += directions[i][1];
-//                    log.add("Moved to: (" + newRow + ", " + newCol + ")");
                 }
 
                 // Stop if we find 'F'
@@ -101,7 +84,6 @@ public class Game {
                         maze[newRow + directions[i][0]][newCol + directions[i][1]].equals("F")) {
                     newRow += directions[i][0];
                     newCol += directions[i][1];
-//                    log.add("Moved to: (" + newRow + ", " + newCol + ")");
                 }
 
                 // Check if the new position is valid and not visited
@@ -112,19 +94,17 @@ public class Game {
                         openSet.addLast(neighbor);
                         allNodes.put(newNodeKey, neighbor);
                         closedSet.add(newNodeKey);
-//                        log.add("Added neighbor: (" + newRow + ", " + newCol + ")");
                     }
                 }
 
                 // If the current move hits an obstacle or boundary, change direction
                 if (!isValid(newRow + directions[i][0], newCol + directions[i][1]) || maze[newRow + directions[i][0]][newCol + directions[i][1]].equals("0")) {
-//                    log.add("Hit obstacle or wall at: (" + newRow + ", " + newCol + ")");
+
                     for (int j = 0; j < directions.length; j++) {
                         if (j != i) {
                             int tempRow = current.row + directions[j][0];
                             int tempCol = current.col + directions[j][1];
                             if (isValid(tempRow, tempCol) && !maze[tempRow][tempCol].equals("0") && !closedSet.contains(nodeKey(tempRow, tempCol))) {
-//                                log.add("Changed direction to: " + directionNames[j]);
                                 newRow = tempRow;
                                 newCol = tempCol;
                                 break;
@@ -136,7 +116,6 @@ public class Game {
         }
 
         if (goalNode != null) {
-//            log.add("Path found from 'S' to 'F':");
             Node traceNode = goalNode;
             Stack<Node> pathStack = new Stack<>();
             while (traceNode != null) {
@@ -154,7 +133,6 @@ public class Game {
             log.add("No path found.");
         }
 
-//        System.out.println("Process Log:");
         for (String entry : log) {
             System.out.println(entry);
         }
