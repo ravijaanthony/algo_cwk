@@ -1,122 +1,214 @@
 import java.util.*;
 
 public class Game {
-    int current_column;
-    int current_row;
-    int goal_column;
-    int goal_row;
+//    static String[][] maze = {
+//            {".", ".", ".", ".", ".", "0", ".", ".", ".", "S"},
+//            {".", ".", ".", ".", "0", ".", ".", ".", ".", "."},
+//            {"0", ".", ".", ".", ".", ".", "0", ".", ".", "0"},
+//            {".", ".", ".", "0", ".", ".", ".", ".", "0", "."},
+//            {".", "F", ".", ".", ".", ".", ".", ".", ".", "0"},
+//            {".", "0", ".", ".", ".", ".", ".", ".", ".", "."},
+//            {".", ".", ".", ".", ".", ".", ".", "0", ".", "."},
+//            {".", "0", ".", "0", ".", ".", "0", ".", ".", "0"},
+//            {"0", ".", ".", ".", ".", ".", ".", ".", ".", "."},
+//            {".", "0", "0", ".", ".", ".", ".", ".", "0", "."}
+//    };
+    static String[][] maze;
 
-    Game(){}
+    static int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    static String[] directionNames = {"UP", "DOWN", "LEFT", "RIGHT"};
 
-    // To find the S and the F and assign them to the variables
-    void startAndEnd(String[][] mazeArray){
-        for (int row = 0; row < mazeArray.length; row++){
-            for (int col = 0; col < mazeArray[row].length; col++){
-                if (Objects.equals(mazeArray[row][col], "S")) {
-                    current_row = row;
-                    current_column = col;
-                } else if (Objects.equals(mazeArray[row][col], "F")) {
-                    goal_row = row;
-                    goal_column = col;
+    static int startRow, startCol;
+    static int endRow, endCol;
+
+    void GameArray(String [][] mazeArray){
+        maze = mazeArray;
+        Stopwatch stopwatch = new Stopwatch();
+        stopwatch.start();
+        Game();
+        stopwatch.stop();
+        System.out.println(stopwatch);
+    }
+
+    static void Game() {
+        findStartAndEnd();
+        List<Node> path = findPath();
+        if (path != null) {
+            System.out.println("\nPath to 'F':");
+            for (Node node : path) {
+                maze[node.row][node.col] = "*";
+            }
+            printMaze();
+        } else {
+            System.out.println("No path found.");
+        }
+    }
+
+    static void findStartAndEnd() {
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze[0].length; j++) {
+                if (maze[i][j].equals("S")) {
+                    startRow = i;
+                    startCol = j;
+                } else if (maze[i][j].equals("F")) {
+                    endRow = i;
+                    endCol = j;
                 }
             }
         }
+//        System.out.println("Start: (" + startRow + ", " + startCol + ")");
+//        System.out.println("End: (" + endRow + ", " + endCol + ")");
     }
 
-    void GameArray(String[][] mazeArray){
-        startAndEnd(mazeArray);
-        List<Node> path = findPath(mazeArray);
-        printPath(path);
-    }
+    static List<Node> findPath() {
+        Deque<Node> openSet = new ArrayDeque<>();
+        Set<String> closedSet = new HashSet<>();
+        Map<String, Node> allNodes = new HashMap<>();
 
-    List<Node> findPath(String[][] mazeArray) {
-        PriorityQueue<Node> openNodes = new PriorityQueue<>();
-        boolean[][] closedNodes = new boolean[mazeArray.length][mazeArray[0].length];
+        Node startNode = new Node(startRow, startCol, 0, heuristic(startRow, startCol, endRow, endCol), null);
+        openSet.addLast(startNode);
+        allNodes.put(nodeKey(startRow, startCol), startNode);
+        closedSet.add(nodeKey(startRow, startCol));
 
-        // Add start node to the open node list
-        Node startNode = new Node(current_row, current_column, 0, heuristic(current_row, current_column, goal_row, goal_column), null);
-        openNodes.add(startNode);
+        Node goalNode = null;
+        List<String> log = new ArrayList<>();
+//        log.add("Start finding 'F'...");
 
-        while (!openNodes.isEmpty()) {
-            Node currentNode = openNodes.poll();
-            closedNodes[currentNode.row][currentNode.col] = true;
+        while (!openSet.isEmpty()) {
+            Node current = openSet.pollFirst();
+//            log.add("Current node: (" + current.row + ", " + current.col + ")");
 
-            if (currentNode.row == goal_row && currentNode.col == goal_column) {
-                return constructPath(currentNode);
+            if (current.row == endRow && current.col == endCol) {
+                goalNode = current;
+                break;
             }
 
-            for (Node neighbor : getNeighbors(currentNode, mazeArray, closedNodes)) {
-                if (closedNodes[neighbor.row][neighbor.col]) continue;
+            for (int i = 0; i < directions.length; i++) {
+                int newRow = current.row;
+                int newCol = current.col;
 
-                int newGCost = currentNode.gCost + 1;
-                if (newGCost < neighbor.gCost || !openNodes.contains(neighbor)) {
-                    neighbor.gCost = newGCost;
-                    neighbor.fCost = neighbor.gCost + neighbor.hCost;
-                    neighbor.parent = currentNode;
-                    openNodes.add(neighbor);
+                // Move in the current direction until hitting an obstacle or maze boundary
+                while (isValid(newRow + directions[i][0], newCol + directions[i][1]) &&
+                        !maze[newRow + directions[i][0]][newCol + directions[i][1]].equals("0") &&
+                        !maze[newRow + directions[i][0]][newCol + directions[i][1]].equals("F")) {
+                    newRow += directions[i][0];
+                    newCol += directions[i][1];
+//                    log.add("Moved to: (" + newRow + ", " + newCol + ")");
+                }
+
+                // Stop if we find 'F'
+                if (isValid(newRow + directions[i][0], newCol + directions[i][1]) &&
+                        maze[newRow + directions[i][0]][newCol + directions[i][1]].equals("F")) {
+                    newRow += directions[i][0];
+                    newCol += directions[i][1];
+//                    log.add("Moved to: (" + newRow + ", " + newCol + ")");
+                }
+
+                // Check if the new position is valid and not visited
+                if ((newRow != current.row || newCol != current.col) && !closedSet.contains(nodeKey(newRow, newCol))) {
+                    String newNodeKey = nodeKey(newRow, newCol);
+                    if (!closedSet.contains(newNodeKey)) {
+                        Node neighbor = new Node(newRow, newCol, current.gCost + 1, heuristic(newRow, newCol, endRow, endCol), current);
+                        openSet.addLast(neighbor);
+                        allNodes.put(newNodeKey, neighbor);
+                        closedSet.add(newNodeKey);
+//                        log.add("Added neighbor: (" + newRow + ", " + newCol + ")");
+                    }
+                }
+
+                // If the current move hits an obstacle or boundary, change direction
+                if (!isValid(newRow + directions[i][0], newCol + directions[i][1]) || maze[newRow + directions[i][0]][newCol + directions[i][1]].equals("0")) {
+//                    log.add("Hit obstacle or wall at: (" + newRow + ", " + newCol + ")");
+                    for (int j = 0; j < directions.length; j++) {
+                        if (j != i) {
+                            int tempRow = current.row + directions[j][0];
+                            int tempCol = current.col + directions[j][1];
+                            if (isValid(tempRow, tempCol) && !maze[tempRow][tempCol].equals("0") && !closedSet.contains(nodeKey(tempRow, tempCol))) {
+//                                log.add("Changed direction to: " + directionNames[j]);
+                                newRow = tempRow;
+                                newCol = tempCol;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
 
-        return null; // No path found
-    }
-
-    List<Node> getNeighbors(Node node, String[][] mazeArray, boolean[][] closedSet) {
-        List<Node> neighbors = new ArrayList<>();
-        int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
-
-        for (int[] direction : directions) {
-            int newRow = node.row;
-            int newCol = node.col;
-
-            while (isInBounds(newRow, newCol, mazeArray) && !Objects.equals(mazeArray[newRow][newCol], "0")) {
-                newRow += direction[0];
-                newCol += direction[1];
+        if (goalNode != null) {
+//            log.add("Path found from 'S' to 'F':");
+            Node traceNode = goalNode;
+            Stack<Node> pathStack = new Stack<>();
+            while (traceNode != null) {
+                pathStack.push(traceNode);
+                traceNode = traceNode.parent;
             }
 
-            newRow -= direction[0];
-            newCol -= direction[1];
-
-            if (!closedSet[newRow][newCol]) {
-                int hCost = heuristic(newRow, newCol, goal_row, goal_column);
-                neighbors.add(new Node(newRow, newCol, node.gCost + 1, hCost, node));
+            int step = 1;
+            while (!pathStack.isEmpty()) {
+                Node stepNode = pathStack.pop();
+                log.add(step + ". Move to (" + stepNode.row + ", " + stepNode.col + ")");
+                step++;
             }
+        } else {
+            log.add("No path found.");
         }
 
-        return neighbors;
+//        System.out.println("Process Log:");
+        for (String entry : log) {
+            System.out.println(entry);
+        }
+
+        if (goalNode != null) {
+            return reconstructPath(goalNode);
+        } else {
+            return null;
+        }
+
     }
 
-    boolean isInBounds(int row, int col, String[][] mazeArray) {
-        return row >= 0 && row < mazeArray.length && col >= 0 && col < mazeArray[0].length;
-    }
-
-    int heuristic(int row, int col, int goalRow, int goalCol) {
-        return Math.abs(row - goalRow) + Math.abs(col - goalCol);
-    }
-
-    List<Node> constructPath(Node node) {
+    static List<Node> reconstructPath(Node goalNode) {
         List<Node> path = new ArrayList<>();
-        while (node != null) {
-            path.add(node);
-            node = node.parent;
+        Node current = goalNode;
+        while (current != null) {
+            path.add(current);
+            current = current.parent;
         }
         Collections.reverse(path);
         return path;
     }
 
-    void printPath(List<Node> path) {
-        if (path == null) {
-            System.out.println("No path found.");
-            return;
-        }
+    static boolean isValid(int row, int col) {
+        return row >= 0 && row < maze.length && col >= 0 && col < maze[0].length;
+    }
 
-        Node startNode = path.get(0);
-        System.out.printf("1. Start at (%d, %d)\n", startNode.row + 1, startNode.col + 1);
+    static int heuristic(int row1, int col1, int row2, int col2) {
+        return Math.abs(row1 - row2) + Math.abs(col1 - col2);
+    }
 
-        for (int i = 1; i < path.size(); i++) {
-            Node node = path.get(i);
-            System.out.printf("%d. Move to (%d, %d)\n", i + 1, node.row + 1, node.col + 1);
+    static String nodeKey(int row, int col) {
+        return row + "," + col;
+    }
+
+    static void printMaze() {
+        for (int i = 0; i < maze.length; i++) {
+            for (int j = 0; j < maze[0].length; j++) {
+                System.out.print(maze[i][j] + " ");
+            }
+            System.out.println();
         }
-        System.out.println("Done!");
+    }
+
+    static class Node {
+        int row, col, gCost, hCost;
+        Node parent;
+
+        Node(int row, int col, int gCost, int hCost, Node parent) {
+            this.row = row;
+            this.col = col;
+            this.gCost = gCost;
+            this.hCost = hCost;
+            this.parent = parent;
+        }
     }
 }
