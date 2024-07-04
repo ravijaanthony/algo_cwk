@@ -1,3 +1,7 @@
+/**
+ * This is a Test file used to optimize the game for different variation of mazes
+ */
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;

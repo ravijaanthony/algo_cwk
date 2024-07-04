@@ -1,14 +1,3 @@
-/* *******************************************
- *  Name: Oshani Shemaya Sandanayaka
- *  IIT ID: 20200474
- *  UoW ID: w1839055
- *
- *  Description: PuzzleQueue class
- *
- *  Last Updated: April 2022
- *  Copyright © 2022 Oshani Sandanayaka. All rights reserved
- ***********************************************/
-
 // Reference - https://www.codespeedy.com/get-the-elapsed-time-in-seconds-in-java/
 
 import java.util.concurrent.TimeUnit;

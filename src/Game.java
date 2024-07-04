@@ -6,32 +6,37 @@ public class Game {
     static int[][] directions = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
     static String[] directionNames = {"UP", "DOWN", "LEFT", "RIGHT"};
 
+    // Start and end position of the maze
     static int startRow, startCol;
     static int endRow, endCol;
 
+    // Initialize the game
     void GameArray(String [][] mazeArray){
         maze = mazeArray;
         Stopwatch stopwatch = new Stopwatch();
-        stopwatch.start();
-        Game();
-        stopwatch.stop();
-        System.out.println(stopwatch);
+        stopwatch.start(); // Start stopwatch
+        Game(); // Start of game logic
+        stopwatch.stop(); // End stopwatch
+        System.out.println(stopwatch); // Print time elapsed
     }
 
+    // The GAME METHOD
     static void Game() {
-        findStartAndEnd();
-        List<Node> path = findPath();
+        findStartAndEnd(); // Find the start and end of the maze
+        List<Node> path = findPath(); // Find path from start to end
         if (path != null) {
             System.out.println("\nPath to 'F':");
+            // Marking the path of the file
             for (Node node : path) {
-                maze[node.row][node.col] = "*";
+                maze[node.row][node.col] = "*";  // Mark the maze path
             }
-            printMaze();
+            printMaze(); // Print the maze path
         } else {
             System.out.println("No path found.");
         }
     }
 
+    // Method to find the maze 'S' and 'F'
     static void findStartAndEnd() {
         for (int i = 0; i < maze.length; i++) {
             for (int j = 0; j < maze[0].length; j++) {
@@ -46,10 +51,11 @@ public class Game {
         }
     }
 
+    // Method to find the path
     static List<Node> findPath() {
-        Deque<Node> openSet = new ArrayDeque<>();
-        Set<String> closedSet = new HashSet<>();
-        Map<String, Node> allNodes = new HashMap<>();
+        Deque<Node> openSet = new ArrayDeque<>(); // To store open nodes
+        Set<String> closedSet = new HashSet<>(); // To store closed nodes
+        Map<String, Node> allNodes = new HashMap<>(); // To store all nodes
 
         Node startNode = new Node(startRow, startCol, 0, heuristic(startRow, startCol, endRow, endCol), null);
         openSet.addLast(startNode);
@@ -145,6 +151,7 @@ public class Game {
 
     }
 
+    // Method to reconstruct the path
     static List<Node> reconstructPath(Node goalNode) {
         List<Node> path = new ArrayList<>();
         Node current = goalNode;
@@ -156,10 +163,12 @@ public class Game {
         return path;
     }
 
+    // Method to check if the row and column is valid or not
     static boolean isValid(int row, int col) {
         return row >= 0 && row < maze.length && col >= 0 && col < maze[0].length;
     }
 
+    // Method to calculate the h value
     static int heuristic(int row1, int col1, int row2, int col2) {
         return Math.abs(row1 - row2) + Math.abs(col1 - col2);
     }
@@ -177,6 +186,7 @@ public class Game {
         }
     }
 
+    // The node class
     static class Node {
         int row, col, gCost, hCost;
         Node parent;
